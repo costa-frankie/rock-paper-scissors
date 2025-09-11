@@ -2,124 +2,97 @@ let humanScore = 0;
 let computerScore = 0;
 
 const gameChoices = [
-        {
-            choice: "rock",
-            beats: "scissors"
-        },
-        {
-            choice: "paper",
-            beats: "rock"
-        },
-        {
-            choice: "scissors",
-            beats: "paper"
-        }
-
-    ];
+    { choice: "rock", beats: "scissors" },
+    { choice: "paper", beats: "rock" },
+    { choice: "scissors", beats: "paper" }
+];
 
 function getComputerChoice () {
-    const randomNumber = Math.floor(Math.random() * 3);
-
-    let computerChoice = gameChoices[randomNumber].choice;
-    return computerChoice;
+    const randomNumber = Math.floor(Math.random() * gameChoices.length);
+    return gameChoices[randomNumber].choice;
 }
 
-let humanChoice = "";
+const human = {
+    score: 0,
+    display: document.createElement('p')
+};
 
-let container = document.querySelector(".container"); 
+const computer = {
+    score: 0,
+    display: document.createElement('p')
+};
 
-container.addEventListener('click', (event) => {
-    if (event.target.className === "game") {
-        humanChoice = event.target.id;    
-        playRound(humanChoice, getComputerChoice());
-    }
-    });
+let gameButtonContainer = document.querySelector(".game-btn-container"); 
+let scoreContainer = document.querySelector('.scores');
+scoreContainer.appendChild(human.display);
+scoreContainer.appendChild(computer.display);
 
 let roundResult = document.createElement('p');
 roundResult.innerText = "";
-container.appendChild(roundResult);
+gameButtonContainer.appendChild(roundResult);
 
-let humanDisplayScore = document.createElement('p');
-let computerDisplayScore = document.createElement('p');
-let scoreContainer = document.querySelector('.scores');
-scoreContainer.appendChild(humanDisplayScore);
-scoreContainer.appendChild(computerDisplayScore);
+let resetButton = document.createElement('button');
+resetButton.innerText = "Restart";
 
+let gameButtons = document.querySelectorAll('.game'); 
 
-const playRound = (humanChoice, computerChoice) => {
-    if (humanScore < 5 && computerScore < 5) {
+function updateDisplayScores() {
+    human.display.innerText = `Your score: ${human.score}`;
+    computer.display.innerText = `Computer score: ${computer.score}`;
+}
+
+function checkGameEnd() {
+    if (human.score === 5) {
+        endGame("won");
+        return true;
+    }
+    if (computer.score === 5) {
+        endGame("lost");
+        return true;
+    }
+    return false;
+}
+
+function playRound(humanChoice, computerChoice) {
+    if (human.score < 5 && computer.score < 5) {
         if (humanChoice === computerChoice) {
-            console.log("It's a tie!");
             roundResult.innerText = "It's a tie!";
         } else {
             const humanObj = gameChoices.find(choice => choice.choice === humanChoice);
             if (humanObj && humanObj.beats === computerChoice) {
-                humanScore += 1;
-                console.log(`You win! ${humanChoice.charAt(0).toUpperCase() + humanChoice.slice(1)} beats ${computerChoice}`);
+                human.score += 1;
                 roundResult.innerText = `You won this round! ${humanChoice.charAt(0).toUpperCase() + humanChoice.slice(1)} beats ${computerChoice}`;
             } else {
-                computerScore += 1;
-                console.log(`You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1)} beats ${humanChoice}`);
+                computer.score += 1;
                 roundResult.innerText = `You lost this round! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1)} beats ${humanChoice}`;
             }
         }
-
-        humanDisplayScore.innerText = `Your score: ${humanScore}`;
-        computerDisplayScore.innerText = `Computer score: ${computerScore}`;
-
-        if (humanScore === 5) {
-            endGame("won");
-        }
-        if (computerScore === 5) {
-            endGame("lost")
-        }
+        updateDisplayScores();
+        checkGameEnd();
     }    
 }
 
-let resetButton = document.createElement('button');
-    resetButton.innerText = "Restart";
-
-let gameButtons = document.querySelectorAll('.game'); 
-
 function endGame(gameResult) { 
     gameButtons.forEach(btn => btn.style.display = "none");
-    container.prepend(resetButton);
+    gameButtonContainer.prepend(resetButton);
     roundResult.innerText = `GAME OVER! You ${gameResult}!`;
 }
 
-resetButton.addEventListener('click', () => {
-    resetGame();
-});
-
 function resetGame() {
-    humanScore = 0;
-    computerScore = 0;
+    human.score = 0;
+    computer.score = 0;
     roundResult.innerText = "";
     gameButtons.forEach(btn => btn.style.display = "inline-block");
     resetButton.remove();
-    humanDisplayScore.innerText = "";
-    computerDisplayScore.innerText = "";
+    human.display.innerText = "";
+    computer.display.innerText = "";
 }
 
-/*let roundsPlayed = 0;
-while (humanScore < 5) {
-    const humanChoice = getHumanChoice();
-    const computerChoice = getComputerChoice();
-    const result = playRound(humanChoice, computerChoice);
-    if (result !== "Invalid choice. Please enter rock, paper, or scissors.") {
-        roundsPlayed++;
-}
-}
+resetButton.addEventListener('click', resetGame);
 
-if (humanScore > computerScore) {
-    console.log(`You won the game! ${humanScore} to ${computerScore}`);
-}
+gameButtonContainer.addEventListener('click', (event) => {
+    if (event.target.className === "game") { 
+        playRound(event.target.id, getComputerChoice());
+    }
+});
 
-if (computerScore > humanScore) {
-    console.log(`You lost the game! ${computerScore} to ${humanScore}`)
-} 
-
-if (computerScore === humanScore) {
-    console.log("The game ended in a tie!");
-}
-*/
