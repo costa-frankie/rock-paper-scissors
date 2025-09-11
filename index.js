@@ -24,14 +24,18 @@ const computer = {
 
 let gameButtonContainer = document.querySelector(".game-btn-container"); 
 let scoreContainer = document.querySelector('.scores');
+human.display.classList.add('score');
+computer.display.classList.add('score');
 scoreContainer.appendChild(human.display);
 scoreContainer.appendChild(computer.display);
 
 let roundResult = document.createElement('p');
 roundResult.innerText = "";
+roundResult.classList.add('result');
 gameButtonContainer.appendChild(roundResult);
 
 let resetButton = document.createElement('button');
+resetButton.classList.add('reset');
 resetButton.innerText = "Restart";
 
 let gameButtons = document.querySelectorAll('.game'); 
